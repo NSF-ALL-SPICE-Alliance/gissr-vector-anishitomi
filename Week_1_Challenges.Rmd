@@ -58,14 +58,14 @@ ggplot() +
 
 ```{r}
 world_without_australia <- world %>% 
-  filter(iso_a3 != "AU1")
+  filter(iso_a3 != "AUS")
 ```
 
 
 ```{r}
 ggplot() + 
-  geom_sf(data = world_without_antarctica) +
-    ggtitle("Countries of the World", subtitle = "without Antarctica")
+  geom_sf(data = world_without_australia) +
+    ggtitle("Countries of the World", subtitle = "without Australia")
 ```
 
 # Map Aesthetics
