@@ -1,0 +1,141 @@
+---
+title: "Week_2_Challenges"
+output: html_document
+date: "2024-09-15"
+---
+# Maps with Multiple Layers
+
+# Assignment: Locator Map Tutorial
+
+Importing Libraries
+```{r}
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+Recreating the world data frame
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+```
+
+# Creating first regional map
+
+## Challenge 1: Create a bounding box for your region. This should be the region around the your target area.
+```{r}
+ggplot(data = world) +
+    geom_sf() +
+    coord_sf(xlim = c(-162, -153), ylim = c(23, 18), expand = FALSE) +
+    ggtitle("Hawaiian Islands")+
+    theme_void()
+```
+
+## Challenge 2: Create a new layer with state/province data for your the country of your final project area.
+```{r}
+states <- (ne_states(country = "United States of America"))
+```
+
+## Challenge 3: Add your new “state” layer to the map.
+```{r}
+ggplot() +
+    geom_sf(data = world) +
+    geom_sf(data = states) +
+    coord_sf(xlim = c(-162, -153), ylim = c(23, 18), expand = FALSE) +
+    ggtitle("Hawaiian Islands")+
+    theme_void()
+```
+
+
+```{r}
+df_layers_cultural
+```
+
+
+```{r}
+pacific_groups <- ne_download(
+  scale = 50,
+  type = "admin_0_pacific_groupings"
+)
+```
+
+```{r}
+ggplot() +
+  geom_sf(data = pacific_groups)+
+  geom_sf(data = world) +
+  geom_sf_text(data = world, aes(label = admin))+
+coord_sf(crs = "+proj=ortho +lat_0=0 +lon_0=-160 ") +
+  coord_sf(xlim = c(145, 175), ylim = c(-20, 5), expand = FALSE) +
+  ggtitle("Solomon Islands", subtitle = "Showing Pacific Island Groupings")+
+  theme_void()
+```
+
+```{r}
+# lakes
+lakes50 <- ne_download(
+  scale = 50, 
+  type = "lakes", 
+  category = "physical")
+```
+```{r}
+# rivers
+rivers50 <- ne_download(
+  scale = 50,
+  type = "rivers_lake_centerlines",
+  category = "physical",
+  returnclass = "sf"
+)
+```
+
+## Challenge 4: Update the coord_sf with your bounding box and your ggtitle with your own title. The states layer should also now be updated with your new states dataframe you created in Challenge 2.
+```{r}
+ggplot() +
+    geom_sf(data = world) +
+    geom_sf(data = states) +
+    geom_sf(data = lakes50) +
+    geom_sf(data = rivers50) +
+    coord_sf(xlim = c(-162, -153), ylim = c(23, 18), expand = FALSE) +
+    ggtitle("Hawaiian Islands")+
+    theme_void()
+```
+
+## Challenge 5: Update the coord_sf with your bounding box and your ggtitle with your own title. Change at least one of the colors in the ggplot code. You can use color names like I have here, or you can specify a color using the hex code.
+```{r}
+ggplot() +
+    geom_sf(data = world, fill = "lightgray") +
+    geom_sf(data = states, fill = "antiquewhite1", size = 0.25) +
+    geom_sf(data = lakes50, fill = "darkblue", color = "black") +
+    geom_sf(data = rivers50, color = "lightblue", size = 0.15) +
+    geom_sf_text(data = states, aes(label = name), size = 5, fontface = "bold", nudge_y = states$nudge_y) +
+    coord_sf(xlim = c(-162, -153), ylim = c(23, 18), expand = FALSE) +
+    ggtitle("Hawaiian Islands")+
+    theme_void()
+```
+
+## Challenge 6: Update the name of the state/province that you are focused on for your project. Remember to change the name of the data object (to the left of the <-) to your target area.
+```{r}
+hawaii <- states %>%
+  filter(name == "Hawaii")
+```
+
+## Challenge 7: Update the code below with all of your changes. You should be changing at least one color, the name of the data object with your target area (in the fifth geom_sf), the bounding box, and the title and subtitle.
+```{r}
+ggplot() +
+    geom_sf(data = world, fill = "lightgray") +
+    geom_sf(data = states, fill = "cornsilk2", size = 0.25) +
+    geom_sf(data = lakes50, fill = "darkblue", color = "black") +
+    geom_sf(data = rivers50, color = "lightblue", size = 0.15) +
+    geom_sf(data = hawaii, fill = "cornsilk2", color = "burlywood")+
+    geom_text(data = states, aes(x = longitude, y = latitude, label = name), size = 5, fontface = "bold", nudge_y = states$nudge_y) +
+    coord_sf(xlim = c(-160, -154), ylim = c(23, 18), expand = FALSE) +
+    ggtitle("State of Hawaii", subtitle = "in the Pacific Ocean")+
+    theme_void()
+```
+
+
+
+
+
+
+
