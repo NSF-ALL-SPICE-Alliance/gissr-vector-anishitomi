@@ -327,6 +327,9 @@ leaflet() %>%
 
 Explore the data available in OpenStreetMap for your chosen location. What data would be relevant to topics you want to focus on? Try to create a draft map or two for your target area and target topics. 
 
+# Possible Topics for Project
+Since I am looking at the island of Oahu and the fact that there is a major overcrowding problem within the prison system, what if I were to Identify the optimal locations for new prison facility based on population density, land availability, and proximity to essential services (e.g., courts, hospitals).  Or the other idea I had was to assess the accessibility and efficiency of public transportation systems in Oahu. 
+
 # More Resources
 
 The resources in this section are not required for this course! They are provided in case you want to learn more. Feel free to come back to them after you finish the course.
