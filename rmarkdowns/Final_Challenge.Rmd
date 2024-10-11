@@ -16,6 +16,247 @@ library("vembedr")
 
 <img src="`r here::here('Images/ALL-SPICE.png')`" width="240" /> <img src="`r here::here('Images/3_CIFAL.png')`" width="200" />
 
+### Introduction
+
+Aloha, my name is Andrew Nishitomi. Currently, I am a student at Chaminade University working towards achieving my Bachelor's degree in Criminal Justice/Criminology and Data Science. The scope of this project is focused on the island of Oahu. In recent years, prisons have ran into the reoccurring issue of overcrowding with inmates and have struggled to house inmates that are born in raised in the State. As a subsequent consequence to the precedent issue at hand, new inmates have had to be send to other prisons within the United States to maintain the current population of state prisons and correctional facilities. This unprecedented issue has inspired me to investigate into whether or not the island of Oahu would be able to create a new facillity to house more inmates. However, I will take into consideration the location of hospitals and courthouses. I will also consider the population density of the Island of Oahu as well. 
+
+### Creation of Map Table of Contents
+See the Distance from Prisons to Hospitals and Courthouses
+
+
+
+### Code
+# Loading in Libraries
+```{r}
+library(tidyverse)
+library(leaflet)
+library(osmdata)
+library(leaflet)
+library(rinat)
+library(sf)
+library(tmap)
+library(plotly)
+```
+
+# Looking at Available Features in OSM data
+```{r}
+available_features()
+```
+
+# Looking at features from the `available_features()` list and use the `available_tags()` function to list all the associated tags.
+```{r}
+available_tags("amenity")
+```
+
+# Getting Boundary Box of the Island of Oahu
+```{r}
+boundary_box <- getbb("Oahu")
+boundary_box
+```
+
+# Use the previously defined bounding box to create the overpass query.
+```{r}
+boundary_box %>% 
+  opq()
+```
+
+## Retreiving OSM Data
+
+Retrieve prison, courthouse, and hospital data for your new bounding box
+```{r}
+prisons <- boundary_box %>%
+  opq() %>%
+  add_osm_feature(key = "amenity", value = "prison") %>%
+  osmdata_sf()
+
+hospitals <- boundary_box %>%
+  opq() %>%
+  add_osm_feature(key = "amenity", value = "hospital") %>%
+  osmdata_sf()
+
+courthouse <- boundary_box %>%
+  opq() %>%
+  add_osm_feature(key = "amenity", value = "courthouse") %>%
+  osmdata_sf()
+```
+
+
+```{r}
+# retrieving data of streets on Oahu
+streets <- boundary_box %>%
+  opq() %>%
+  add_osm_feature("highway", c("motorway", "primary", "secondary", "tertiary")) %>%
+  osmdata_sf()
+
+# retrieving data of small streets on Oahu
+small_streets <- boundary_box %>%
+  opq() %>%
+  add_osm_feature(key = "highway", value = c( "living_street", "unclassified", "service", "footway")) %>%
+  osmdata_sf()
+
+# retrieving data of coastline on Oahu
+coastline <- boundary_box %>%
+  opq() %>%
+  add_osm_feature(key = "natural", value = "coastline") %>%
+  osmdata_sf()
+```
+
+```{r}
+# visualising all retrieved features over each other to form a map of Oahu
+ggplot() +
+  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#ffbe7f", size = .4, alpha = .8) +
+  geom_sf(data = small_streets$osm_lines, inherit.aes = FALSE, color = "#a6a6a6", size = .2, alpha = .8) +
+  geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size = .8, alpha = .5) +
+  geom_sf(data = prisons$osm_polygons, inherit.aes = FALSE, colour = "red", fill = "red", alpha = .5, size = 10) +
+  geom_sf(data = hospitals$osm_polygons, inherit.aes = FALSE, colour = "green", fill = "green", alpha = .5, size = 10) +
+  geom_sf(data = hospitals$osm_polygons, inherit.aes = FALSE, colour = "blue", fill = "blue", alpha = .5, size = 10) +
+  coord_sf(xlim = c(-158.28058, -157.64863), ylim = c(21.25482, 21.71201), expand = TRUE) +
+  geom_sf_text(data = prisons$osm_polygons, aes(label = name), size = 2, hjust = 0) +
+  geom_sf_text(data = hospitals$osm_polygons, aes(label = name), size = 2, hjust = 0) +
+  geom_sf_text(data = courthouse$osm_polygons, aes(label = name), size = 2, hjust = 0) +
+  theme_bw() +
+  labs(
+    title = "Distance of Prisons to Hospitals and Courhouses on Oahu",
+    x = "Longitude",
+    y = "Latitude"
+  )
+```
+
+### Use GGplot to better display the data points
+```{r}
+# Plot the map
+ggplot() +
+  # Base map: street lines or coastlines (optional)
+  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#d3d3d3", size = 0.5) +
+  geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size = 0.8) +
+  
+  # Plot prisons as red points
+  geom_sf(data = prisons$osm_polygons, color = "red", size = 25, shape = 21, fill = "red") +
+  
+  # Plot hospitals as green points
+  geom_sf(data = hospitals$osm_polygons, color = "green", size = 25, shape = 21, fill = "green") +
+  
+  # Plot courthouses as blue points
+  geom_sf(data = courthouse$osm_polygons, color = "blue", size = 25, shape = 21, fill = "blue") +
+  
+  # Optionally, add labels next to the points (name of the location)
+  #geom_sf_text(data = prisons$osm_polygons, aes(label = name), color = "red", size = 3, nudge_y = 0.005) +
+  #geom_sf_text(data = hospitals$osm_polygons, aes(label = name), color = "green", size = 3, nudge_y = 0.005) +
+  #geom_sf_text(data = courthouse$osm_polygons, aes(label = name), color = "blue", size = 3, nudge_y = 0.005) +
+  
+  # Coordinate limits and base theme
+  coord_sf(xlim = c(-158.3, -157.6), ylim = c(21.1, 21.8), expand = FALSE) +
+  theme_minimal() +
+  
+  # Labels and title
+  labs(
+    title = "Locations of Prisons, Hospitals, and Courthouses on Oahu",
+    x = "Longitude",
+    y = "Latitude"
+  )
+
+```
+
+```{r}
+# Assuming `prisons`, `hospitals`, and `courthouses` are your sf objects with valid geometries.
+
+# Extract coordinates for prisons, hospitals, and courthouses
+prison_coords <- st_coordinates(prisons$osm_polygons)
+hospital_coords <- st_coordinates(hospitals$osm_polygons)
+courthouse_coords <- st_coordinates(courthouse$osm_polygons)
+
+# Combine data into a single data frame for plotting
+plot_data <- data.frame(
+  lon = c(prison_coords[, 1], hospital_coords[, 1], courthouse_coords[, 1]),
+  lat = c(prison_coords[, 2], hospital_coords[, 2], courthouse_coords[, 2]),
+  type = factor(c(rep("Prison", nrow(prison_coords)), 
+                  rep("Hospital", nrow(hospital_coords)), 
+                  rep("Courthouse", nrow(courthouse_coords))))
+)
+
+# Plot the map with scatter points
+ggplot() +
+  # Base map: street lines or coastlines (optional)
+  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#d3d3d3", size = 0.5) +
+  geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size = 0.8) +
+  
+  # Plot points for each type
+  geom_point(data = plot_data, aes(x = lon, y = lat, color = type), size = 3) +
+  
+  # Set coordinate limits and base theme
+  coord_sf(xlim = c(-158.3, -157.6), ylim = c(21.2, 21.7), expand = FALSE) +
+  theme_minimal() +
+  
+  # Labels and title
+  labs(
+    title = "Locations of Prisons, Hospitals, and Courthouses on Oahu",
+    x = "Longitude",
+    y = "Latitude",
+    color = "Type"
+  ) +
+  scale_color_manual(values = c("Prison" = "red", "Hospital" = "green", "Courthouse" = "blue"))
+
+```
+
+
+Usage of ChatGPT and mapping Density
+```{r}
+options(tigris_use_cache = TRUE)
+
+# Set your Census API key
+census_api_key("YOUR_CENSUS_API_KEY", install = TRUE, overwrite = TRUE)
+
+# Define the bounding box for Oahu (Longitude, Latitude), using WGS84 (EPSG: 4326)
+oahu_bbox <- st_bbox(c(xmin = -158.3, xmax = -157.6, ymin = 21.2, ymax = 21.7), crs = st_crs(4326))
+
+# Get population data for Oahu (Honolulu County FIPS: 15003)
+oahu_population <- get_acs(geography = "tract",
+                           variables = "B01003_001", # Total population
+                           state = "HI",
+                           county = "Honolulu",
+                           geometry = TRUE, # Get geometries for mapping
+                           year = 2022)
+
+# Check and ensure the CRS matches the bounding box CRS
+if (st_crs(oahu_population) != st_crs(oahu_bbox)) {
+  oahu_population <- st_transform(oahu_population, crs = st_crs(oahu_bbox))
+}
+
+# Check for any missing geometries and remove them
+oahu_population <- oahu_population %>%
+  filter(!st_is_empty(geometry)) %>%  # Remove any rows with missing geometries
+  drop_na(geometry)                   # Drop rows with NA in the geometry column
+
+# Crop the data to Oahu bounding box
+oahu_population <- st_crop(oahu_population, oahu_bbox)
+
+# Calculate population density (handling zero area or small area issues)
+oahu_population <- oahu_population %>%
+  mutate(area_km2 = as.numeric(st_area(geometry)) / 1e6,  # Convert area to km² and remove units for compatibility
+         density = estimate / area_km2) %>%
+  filter(area_km2 > 0 & !is.na(density))  # Remove tracts with zero or missing area
+
+# Avoid infinite values by setting a small minimum value for population density
+oahu_population <- oahu_population %>%
+  mutate(density_log = ifelse(density > 0, density, NA))  # Replace zero densities with NA
+
+# Plot population density using ggplot2
+ggplot(oahu_population) +
+  geom_sf(aes(fill = density_log), color = NA) +  # Fill based on population density
+  scale_fill_viridis_c(option = "plasma", trans = "log", name = "Population Density\n(people/km²)", na.value = "white") + # Log scale for better contrast
+  theme_minimal() +
+  labs(
+    title = "Population Density of Oahu (Census Tracts, 2020)",
+    subtitle = "Source: U.S. Census Bureau, ACS 2020",
+    caption = "Map created using tidycensus and tigris"
+  ) +
+  coord_sf(xlim = c(oahu_bbox["xmin"], oahu_bbox["xmax"]), 
+           ylim = c(oahu_bbox["ymin"], oahu_bbox["ymax"]), 
+           expand = FALSE)  # Set the coordinate limits to match the bounding box
+
+
+```
+
 Your final challenge in this course is to choose a location that is important to you and to produce maps that illustrate aspects of sustainability and/or resilience in that location. Each map should tell a story that will inspire people to take action to increase sustainability/resilience in your chosen location. 
 
 This final project can be in any language you are comfortable using. I would love to see projects in your native language if it is not English! If you need help translating the text in your maps, please reach out to the instructor.
