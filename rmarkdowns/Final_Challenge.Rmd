@@ -16,17 +16,20 @@ library("vembedr")
 
 <img src="`r here::here('Images/ALL-SPICE.png')`" width="240" /> <img src="`r here::here('Images/3_CIFAL.png')`" width="200" />
 
-### Introduction
+ 
 
+<img src="`r here::here('Images/E-WEB-Goal-03.png')`" width="100" /> <img src="`r here::here('Images/E-WEB-Goal-11.png')`" width="100" /> <img src="`r here::here('Images/E-WEB-Goal-16.png')`" width="100" />
+
+# Project Location
+## Island of Oahu
+
+# Introduction and Project Details
 Aloha, my name is Andrew Nishitomi. Currently, I am a student at Chaminade University working towards achieving my Bachelor's degree in Criminal Justice/Criminology and Data Science. The scope of this project is focused on the island of Oahu. In recent years, prisons have ran into the reoccurring issue of overcrowding with inmates and have struggled to house inmates that are born in raised in the State. As a subsequent consequence to the precedent issue at hand, new inmates have had to be send to other prisons within the United States to maintain the current population of state prisons and correctional facilities. This unprecedented issue has inspired me to investigate into whether or not the island of Oahu would be able to create a new facillity to house more inmates. However, I will take into consideration the location of hospitals and courthouses. I will also consider the population density of the Island of Oahu as well. 
 
-### Creation of Map Table of Contents
-See the Distance from Prisons to Hospitals and Courthouses
 
 
-
-### Code
-# Loading in Libraries
+# Code
+### Loading in Libraries
 ```{r}
 library(tidyverse)
 library(leaflet)
@@ -38,29 +41,29 @@ library(tmap)
 library(plotly)
 ```
 
-# Looking at Available Features in OSM data
+#### Looking at Available Features in OSM data
 ```{r}
 available_features()
 ```
 
-# Looking at features from the `available_features()` list and use the `available_tags()` function to list all the associated tags.
+#### Looking at features from the `available_features()` list and use the `available_tags()` function to list all the associated tags.
 ```{r}
 available_tags("natural")
 ```
 
-# Getting Boundary Box of the Island of Oahu
+#### Getting Boundary Box of the Island of Oahu
 ```{r}
 boundary_box <- getbb("Oahu")
 boundary_box
 ```
 
-# Use the previously defined bounding box to create the overpass query.
+#### Use the previously defined bounding box to create the overpass query.
 ```{r}
 boundary_box %>% 
   opq()
 ```
 
-## Retreiving OSM Data
+### Retreiving OSM Data
 
 Retrieve prison, courthouse, and hospital data for your new bounding box
 ```{r}
@@ -80,7 +83,7 @@ courthouse <- boundary_box %>%
   osmdata_sf()
 ```
 
-
+Retreiving streets, small streets, and coastline data for the map
 ```{r}
 # retrieving data of streets on Oahu
 streets <- boundary_box %>%
@@ -101,6 +104,8 @@ coastline <- boundary_box %>%
   osmdata_sf()
 ```
 
+# Create Maps
+#### Create a map with locations of facillities
 ```{r}
 # visualising all retrieved features over each other to form a map of Oahu
 ggplot() +
@@ -121,7 +126,10 @@ ggplot() +
     y = "Latitude"
   )
 ```
-### Interpretation of the Map
+
+
+
+#### Interpretation of the Map
 Here we can see the names of the different Hospitals, Courthouses, and Prisons. However, it is difficult to pin point where exactly are these locations.In doing so, lets create a map without the location names and see their locations using scatter points. That way we can look at the distancs that would need to be traveled to these locations. 
 
 ```{r, include=FALSE}
@@ -158,7 +166,7 @@ ggplot() +
 
 ```
 
-### Creating a map without location names and have them appear as scatter points. 
+#### Creating a map without location names and have them appear as scatter points. 
 ```{r}
 # Assuming `prisons`, `hospitals`, and `courthouses` are your sf objects with valid geometries.
 
@@ -202,7 +210,7 @@ ggplot() +
 ```
 
 ### Interpretation
-From this map, we can generally see the distances from prisons, courthouses, and hospitals. From this image of the map, we can see that there are generally a hospital that is closer to the prisons/correction facilities. One thing to note is that these points are not specific to the name of the courthouse. Some courthouses may not be for federal criminal cases. Where we see a courthouse located Southeast is where there is a federal courthouse.The Courthouses located West/Southwest of the island are more like State Court buildings. So that is one thing to note. However, we do see that the general distancef rom prisons to hospitals are significantly close. From this map, we can also assume that there are buildings closely associated with the small streets as shown on the map as well. So therefore, we can assume 
+From this map, we can generally see the distances from prisons, courthouses, and hospitals. From this image of the map, we can see that there are generally a hospital that is closer to the prisons/correction facilities. One thing to note is that these points are not specific to the name of the courthouse. Some courthouses may not be for federal criminal cases. Where we see a courthouse located Southeast is where there is a federal courthouse.The Courthouses located West/Southwest of the island are more like State Court buildings. So that is one thing to note. However, we do see that the general distance from prisons to hospitals are significantly close. From this map, we can also assume that there are buildings closely associated with the small streets as shown on the map as well. The data came from the OSM data and for the next map I decided to use the exact locations of all facilities on Oahu by searching all of their data points. 
 
 
 ### Produce a leaflet map
@@ -247,88 +255,6 @@ Being able to combine our idea from our previous map allows us to have the capab
 The data came from looking up all the possible locations for prisons, hospitals, and courthouses on the Island of Oahu and retrieving each individual longitude and latitude point for the prospective locations. This would allow for a more accurate representation of all the hospitals and courthouses in comparison to the two maps that were previously made. 
 
 
+# Recommendations for future work
+I think that looking at the population density is something that can be incorporated into this project. The island of Oahu is essentially building on top of what is already built and will soon run out of space on the island to add facilities to widstand the population growth over time. With that being said, crime is also bound to increase as well. So will the state continue to send inmates to the other states? Or, will they find a way to build a new facillity?
 
-Your final challenge in this course is to choose a location that is important to you and to produce maps that illustrate aspects of sustainability and/or resilience in that location. Each map should tell a story that will inspire people to take action to increase sustainability/resilience in your chosen location. 
-
-This final project can be in any language you are comfortable using. I would love to see projects in your native language if it is not English! If you need help translating the text in your maps, please reach out to the instructor.
-
-## Target Area
-
-Choose a location that is *meaningful to you*. This can be where you currently live, your hometown, where your family is from, etc. I recommend choosing a location that is larger than a neighborhood and smaller than a large country (e.g. United States, China).
-
-All of your maps will show data related to this target area, though maps may be at different scales depending on the available data.
-
-## Sustainability and Resilience Topics
-
-You may choose any topics related to sustainability and/or resilience that you are interested in and that *you can quickly find data for*; you want to focus most of your time on building, improving, and interpreting your maps, not on finding, cleaning, and wrangling data.
-
-I recommend using APIs for OpenStreetMap and/or iNaturalist for your first two required maps, since you already know how to use them to retrieve data, and they should have at least some data available for your location. 
-
-## The Assignment
-
-### Step 1: Edit this RMarkdown ("Final_Challenge.Rmd)
-
-Leave these instructions at the bottom of your .rmd until you have finished the rest of the assignment, so you can easily refer to them. 
-
-Fill out the YAML header with your project title, your name, and choose a theme that you like. See this [guide](https://rpubs.com/ranydc/rmarkdown_themes) for help with setting a theme.
-
-I recommend a title like this: "Topic1 and Topic2 in Location", where you fill in the topics you cover and the location you choose.
-
-Use this [guide](https://www.rstudio.com/wp-content/uploads/2015/03/rmarkdown-reference.pdf) for help with formatting your RMarkdown, for example, using bold or italics, creating headers, adding images, etc.
-
-### Step 2: Create your sections
-
-Each section should have a header with the title of the section. This will organize your project, and will automatically fill your table of contents. 
-
-Start with an introduction section, which includes an introduction to yourself, the location you are focused on, and the topics you will cover. **Include a locator map to familiarize the reader with your target area.**
-
-Create a separate section for each topic you will cover. Include an image showing which SDG is related to this topic. Each section will have at least one map (you will add your maps later in step 4.
-
-### Step 3: Code setup
-
-Add your "setup" code chunk just below the YAML header. This is where you will load all of your libraries and set any global options (add them as you need them for your data retrieval and maps). You can also make #comments about the libraries and code you use below. You want someone to be able to recreate your maps and use your code to create their own.
-
-### Step 4: Create your sustainability and resilience maps
-
-Using what you have learned so far in this course, create at least one "static" map and one "interactive" map for your chosen location. Start with just a rough draft. You are welcome to create more than two maps, but start with two and complete steps 5 and 6 for those before you add any more. 
-
-Don't reinvent the wheel if you don't have to. Use the code we have practiced with to get started, and alter the code for your location and topic. If you have draft maps from our previous exercises that work for this, use those! If you can find code online that is similar to what you want to do, use it!
-
-### Step 5: Interpret and explain your maps
-
-Add text above and below your map that explains what we can see in the data. This is your explanation and interpretation of the data. 
-
-This should include:
-
-- Where the data came from
-- Interesting patterns in the data
-- Limitations of the data
-- Recommendations for the community to improve sustainability/resilience based on the data (call to action)
-
-### Step 6: Improve your maps
-
-Use everything you have learned about cartographic design to improve your maps. Each map should include a title and a legend. 
-
-You may want to experiment with different highlighted elements, color schemes, classification/symbology schemes, base maps, contextual data, themes, coordinate reference systems, and other elements. You may want to add a note with metadata, such as author (that's you!), data source, date of publication, explanatory text, etc. You may also want to simplify your map by removing certain elements to make it more clear. 
-
-Your goal for each map is to make it *clear, clean, and telling one story* to your reader. 
-
-### Step 7: Make more maps
-
-If you have time, try to make more maps and follow the instructions for steps 4-6 for each one.
-
-### Step 8: Clean up your R Markdown 
-
-Check for spelling and formatting mistakes, add more explanatory text, make sure you are telling a story in each section that will lead people to take action based on your map. 
-
-### Step 9: Push your final version to GitHub with a commit message saying "Finished Final Challenge."
-
-## After the Challenge: Additional Resources
-
-My hope is that after completing this course, you have some ideas about what you would like to learn next. 
-
-Here is a list of resources to help you continue your geospatial data journey:
-
-* [Spatial Data Science with R and “terra”](https://rspatial.org) Free tutorials. "These resources teach spatial data analysis and modeling with R. R is a widely used programming language and software environment for data science. R also provides unparalleled opportunities for analyzing spatial data and for spatial modeling."
-* [Spatial Data Science](https://r-spatial.org/book/) Free ebook. "This book introduces and explains the concepts underlying spatial data: points, lines, polygons, rasters, coverages, geometry attributes, data cubes, reference systems, as well as higher-level concepts including how attributes relate to geometries and how this affects analysis. ... The book aims at data scientists who want to get a grip on using spatial data in their analysis. To exemplify how to do things, it uses R."
-* [Analyzing US Census Data: Methods, Maps, and Models in R](https://walker-data.com/census-r/index.html) Free ebook. Check out the rest of this book (we only covered a few chapters) for lots of great ideas for using US Census data. "Census data is widely used in the United States across numerous research and applied fields, including education, business, journalism, and many others. Until recently, the process of working with US Census data has required the use of a wide array of web interfaces and software platforms to prepare, map, and present data products. The goal of this book is to illustrate the utility of the R programming language for handling these tasks, allowing Census data users to manage their projects in a single computing environment."
