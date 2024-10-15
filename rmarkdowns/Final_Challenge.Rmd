@@ -45,7 +45,7 @@ available_features()
 
 # Looking at features from the `available_features()` list and use the `available_tags()` function to list all the associated tags.
 ```{r}
-available_tags("amenity")
+available_tags("natural")
 ```
 
 # Getting Boundary Box of the Island of Oahu
@@ -111,9 +111,9 @@ ggplot() +
   geom_sf(data = hospitals$osm_polygons, inherit.aes = FALSE, colour = "green", fill = "green", alpha = .5, size = 10) +
   geom_sf(data = hospitals$osm_polygons, inherit.aes = FALSE, colour = "blue", fill = "blue", alpha = .5, size = 10) +
   coord_sf(xlim = c(-158.28058, -157.64863), ylim = c(21.25482, 21.71201), expand = TRUE) +
-  geom_sf_text(data = prisons$osm_polygons, aes(label = name), size = 2, hjust = 0) +
-  geom_sf_text(data = hospitals$osm_polygons, aes(label = name), size = 2, hjust = 0) +
-  geom_sf_text(data = courthouse$osm_polygons, aes(label = name), size = 2, hjust = 0) +
+  geom_sf_text(data = prisons$osm_polygons, aes(label = name), size = 1.5, hjust = 0) +
+  geom_sf_text(data = hospitals$osm_polygons, aes(label = name), size = 1.5, hjust = 0) +
+  geom_sf_text(data = courthouse$osm_polygons, aes(label = name), size = 1.5, hjust = 0) +
   theme_bw() +
   labs(
     title = "Distance of Prisons to Hospitals and Courhouses on Oahu",
@@ -121,13 +121,14 @@ ggplot() +
     y = "Latitude"
   )
 ```
+### Interpretation of the Map
+Here we can see the names of the different Hospitals, Courthouses, and Prisons. However, it is difficult to pin point where exactly are these locations.In doing so, lets create a map without the location names and see their locations using scatter points. That way we can look at the distancs that would need to be traveled to these locations. 
 
-### Use GGplot to better display the data points
-```{r}
+```{r, include=FALSE}
 # Plot the map
 ggplot() +
   # Base map: street lines or coastlines (optional)
-  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#d3d3d3", size = 0.5) +
+  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#ffbe7f", size = 0.5) +
   geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size = 0.8) +
   
   # Plot prisons as red points
@@ -157,6 +158,7 @@ ggplot() +
 
 ```
 
+### Creating a map without location names and have them appear as scatter points. 
 ```{r}
 # Assuming `prisons`, `hospitals`, and `courthouses` are your sf objects with valid geometries.
 
@@ -177,14 +179,15 @@ plot_data <- data.frame(
 # Plot the map with scatter points
 ggplot() +
   # Base map: street lines or coastlines (optional)
-  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#d3d3d3", size = 0.5) +
+  geom_sf(data = streets$osm_lines, inherit.aes = FALSE, color = "#ffbe7f", size = 0.5) +
+  geom_sf(data = small_streets$osm_lines, inherit.aes = FALSE, color = "#a6a6a6", size = .2, alpha = .8) +
   geom_sf(data = coastline$osm_lines, inherit.aes = FALSE, color = "black", size = 0.8) +
   
   # Plot points for each type
-  geom_point(data = plot_data, aes(x = lon, y = lat, color = type), size = 3) +
+  geom_point(data = plot_data, aes(x = lon, y = lat, color = type), size = 1) +
   
   # Set coordinate limits and base theme
-  coord_sf(xlim = c(-158.3, -157.6), ylim = c(21.2, 21.7), expand = FALSE) +
+  coord_sf(xlim = c(-158.3, -157.6), ylim = c(21.25, 21.75), expand = FALSE) +
   theme_minimal() +
   
   # Labels and title
@@ -198,64 +201,52 @@ ggplot() +
 
 ```
 
+### Interpretation
+From this map, we can generally see the distances from prisons, courthouses, and hospitals. From this image of the map, we can see that there are generally a hospital that is closer to the prisons/correction facilities. One thing to note is that these points are not specific to the name of the courthouse. Some courthouses may not be for federal criminal cases. Where we see a courthouse located Southeast is where there is a federal courthouse.The Courthouses located West/Southwest of the island are more like State Court buildings. So that is one thing to note. However, we do see that the general distancef rom prisons to hospitals are significantly close. From this map, we can also assume that there are buildings closely associated with the small streets as shown on the map as well. So therefore, we can assume 
 
-Usage of ChatGPT and mapping Density
+
+### Produce a leaflet map
 ```{r}
-options(tigris_use_cache = TRUE)
+library(leaflet)
 
-# Set your Census API key
-census_api_key("YOUR_CENSUS_API_KEY", install = TRUE, overwrite = TRUE)
+# Data frame with hospitals, courthouses, and prisons on Oahu
+locations_oahu <- data.frame(
+  name = c("The Queen's Medical Center", "Kaiser Permanente Moanalua Medical Center", "Pali Momi Medical Center",
+           "Straub Medical Center", "Kapi'olani Medical Center", "Adventist Health Castle",
+           "Kuakini Medical Center", "Wahiawa General Hospital", "Tripler Army Medical Center",
+           "First Circuit Court", "Hawaii Supreme Court", "Kapolei Court Complex",
+           "Ewa District Court", "Wahiawa District Court", "Waianae District Court",
+           "Kaneohe District Court", "Oahu Community Correctional Center", "Halawa Correctional Facility",
+           "Women's Community Correctional Center", "Waiawa Correctional Facility"),
+  type = c(rep("Hospital", 9), rep("Courthouse", 7), rep("Prison", 4)),
+  lat = c(21.3099, 21.3754, 21.3854, 21.3045, 21.2956, 21.3889, 21.3210, 21.5016, 21.3606,
+          21.3073, 21.3066, 21.3355, 21.3386, 21.5022, 21.4443, 21.4036,
+          21.3242, 21.3853, 21.3985, 21.4448),
+  lng = c(-157.8545, -157.8870, -157.9458, -157.8511, -157.8419, -157.7896, -157.8567, -158.0190, -157.8902,
+          -157.8581, -157.8609, -158.0482, -158.0365, -158.0189, -158.1924, -157.7995,
+          -157.8687, -157.9076, -157.7861, -157.9786)
+)
 
-# Define the bounding box for Oahu (Longitude, Latitude), using WGS84 (EPSG: 4326)
-oahu_bbox <- st_bbox(c(xmin = -158.3, xmax = -157.6, ymin = 21.2, ymax = 21.7), crs = st_crs(4326))
-
-# Get population data for Oahu (Honolulu County FIPS: 15003)
-oahu_population <- get_acs(geography = "tract",
-                           variables = "B01003_001", # Total population
-                           state = "HI",
-                           county = "Honolulu",
-                           geometry = TRUE, # Get geometries for mapping
-                           year = 2022)
-
-# Check and ensure the CRS matches the bounding box CRS
-if (st_crs(oahu_population) != st_crs(oahu_bbox)) {
-  oahu_population <- st_transform(oahu_population, crs = st_crs(oahu_bbox))
-}
-
-# Check for any missing geometries and remove them
-oahu_population <- oahu_population %>%
-  filter(!st_is_empty(geometry)) %>%  # Remove any rows with missing geometries
-  drop_na(geometry)                   # Drop rows with NA in the geometry column
-
-# Crop the data to Oahu bounding box
-oahu_population <- st_crop(oahu_population, oahu_bbox)
-
-# Calculate population density (handling zero area or small area issues)
-oahu_population <- oahu_population %>%
-  mutate(area_km2 = as.numeric(st_area(geometry)) / 1e6,  # Convert area to km² and remove units for compatibility
-         density = estimate / area_km2) %>%
-  filter(area_km2 > 0 & !is.na(density))  # Remove tracts with zero or missing area
-
-# Avoid infinite values by setting a small minimum value for population density
-oahu_population <- oahu_population %>%
-  mutate(density_log = ifelse(density > 0, density, NA))  # Replace zero densities with NA
-
-# Plot population density using ggplot2
-ggplot(oahu_population) +
-  geom_sf(aes(fill = density_log), color = NA) +  # Fill based on population density
-  scale_fill_viridis_c(option = "plasma", trans = "log", name = "Population Density\n(people/km²)", na.value = "white") + # Log scale for better contrast
-  theme_minimal() +
-  labs(
-    title = "Population Density of Oahu (Census Tracts, 2020)",
-    subtitle = "Source: U.S. Census Bureau, ACS 2020",
-    caption = "Map created using tidycensus and tigris"
-  ) +
-  coord_sf(xlim = c(oahu_bbox["xmin"], oahu_bbox["xmax"]), 
-           ylim = c(oahu_bbox["ymin"], oahu_bbox["ymax"]), 
-           expand = FALSE)  # Set the coordinate limits to match the bounding box
+# Create Leaflet map centered on Oahu
+leaflet(data = locations_oahu) %>%
+  addTiles() %>%
+  setView(lng = -158.0001, lat = 21.4389, zoom = 11) %>%  # Center map on Oahu
+  addCircleMarkers(~lng, ~lat,
+                   color = ~ifelse(type == "Prison", "red",
+                                   ifelse(type == "Courthouse", "blue", "green")),
+                   radius = 6,
+                   label = ~paste(name, type),
+                   popup = ~paste("Location:", name, "<br>", "Type:", type))
 
 
 ```
+
+### Interpretation of Leaflet Map
+Being able to combine our idea from our previous map allows us to have the capability to access not only the distance from each Hospital, Courthouse, and Prison/Jail, but we have the ability to see if there is any available land to build a new prison. Based on our map above, we can see that it would be difficult to build a new prison based on the visual above. The space is very limited and restricted. Another thing to note is that we were able to add the names to the individual points of the locations as well. 
+
+The data came from looking up all the possible locations for prisons, hospitals, and courthouses on the Island of Oahu and retrieving each individual longitude and latitude point for the prospective locations. This would allow for a more accurate representation of all the hospitals and courthouses in comparison to the two maps that were previously made. 
+
+
 
 Your final challenge in this course is to choose a location that is important to you and to produce maps that illustrate aspects of sustainability and/or resilience in that location. Each map should tell a story that will inspire people to take action to increase sustainability/resilience in your chosen location. 
 
