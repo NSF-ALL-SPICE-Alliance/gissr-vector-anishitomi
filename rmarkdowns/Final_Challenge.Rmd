@@ -48,7 +48,7 @@ available_features()
 
 #### Looking at features from the `available_features()` list and use the `available_tags()` function to list all the associated tags.
 ```{r}
-available_tags("natural")
+available_tags("amenity")
 ```
 
 #### Getting Boundary Box of the Island of Oahu
@@ -256,5 +256,6 @@ The data came from looking up all the possible locations for prisons, hospitals,
 
 
 # Recommendations for future work
-I think that looking at the population density is something that can be incorporated into this project. The island of Oahu is essentially building on top of what is already built and will soon run out of space on the island to add facilities to widstand the population growth over time. With that being said, crime is also bound to increase as well. So will the state continue to send inmates to the other states? Or, will they find a way to build a new facillity?
+
+For the future, exploring the population density is something that can be incorporated into this project. The island of Oahu is essentially building on top of what is already built and will soon run out of space on the island to add facilities to withstand the population growth over time. With that being said, crime is also bound to increase as well. This idea is clearly through subjective thinking and as a resident that currently lives on Oahu as well. Here are some questions that can be answered in the future. So will the state continue to send inmates to the other states? Or, will they find a way to build a new facility?
 
