@@ -1,0 +1,123 @@
+---
+title: "Visualizing Spatial Data Tutorial"
+output: html_document
+date: "2024-09-13"
+---
+
+# Setting up the Environment
+```{r setup, include=FALSE}
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+```
+
+# Creating the first world map
+```{r}
+world <- ne_countries(scale = "medium", returnclass = "sf")
+class(world)
+```
+
+# Creating a viz of the world map
+```{r}
+ggplot(data = world) +
+  geom_sf()
+```
+
+# Adding improvements to world map
+```{r}
+ggplot(data = world) +
+  geom_sf() +
+  labs(x = "Longitude", y = "Latitude")
+```
+
+
+
+# Challenge 1: Change the subtitle in the code to your name instead of mine. Feel free to change the title and subtitle to another language!
+```{r}
+ggplot(data = world) +
+  geom_sf() +
+  ggtitle("Countries of the World", subtitle = "Created by Andrew Nishitomi") +
+  labs(x = "longitude", y = "Latitude")
+```
+
+# Improving the World Map
+## Removing Antartica
+```{r}
+world_without_antarctica <- world %>% 
+  filter(iso_a3 != "ATA")
+```
+
+```{r}
+ggplot() + 
+  geom_sf(data = world_without_antarctica)
+```
+
+
+## Challenge 2: Instead of removing antarctica, remove Australia from the map. Remember to change the name of the dataframe to something like world_without_Australia.
+
+```{r}
+world_without_australia <- world %>% 
+  filter(iso_a3 != "AUS")
+```
+
+
+```{r}
+ggplot() + 
+  geom_sf(data = world_without_australia) +
+    ggtitle("Countries of the World", subtitle = "without Australia")
+```
+
+# Map Aesthetics
+## Challenge 3: Try out different colors on your map until you find a combination that you like.
+```{r}
+ggplot() + 
+  geom_sf(data = world_without_antarctica, 
+          fill = "#7fffd4", color = "#32481B", size = 0.25) +
+  ggtitle("Countries of the World", subtitle = "without Antarctica")
+```
+
+```{r}
+ggplot() + 
+  geom_sf(data = world_without_antarctica, 
+          fill = "#669438", color = "#32481B", size = 0.25) +
+  ggtitle("Countries of the World", subtitle = "without Antarctica")+
+  theme_void()
+```
+
+## Challenge 4: Try a few different discrete color palettes and choose one that you like.
+```{r}
+ggplot() + 
+  geom_sf(data = world_without_antarctica, 
+          aes(fill = as.factor(mapcolor7)),
+          color = "#401D16", size = 0.25) +
+  scale_fill_brewer(palette = "Pastel1") +
+  guides(fill = "none") +
+  theme_void()
+```
+
+# Changing your map CRS (Coordinate Reference System)
+```{r}
+st_crs(world_without_antarctica)
+```
+```{r}
+ggplot() + 
+  geom_sf(data = world_without_antarctica, 
+          fill = "#669438", color = "#32481B", size = 0.25) +
+  coord_sf(crs = st_crs("ESRI:54030")) +  # Robinson
+  # Or use the name instead of the number
+  # coord_sf(crs = "+proj=robin")
+  ggtitle("Countries of the World", subtitle = "Robinson Projection")+
+  theme_void()
+```
+
+# Change the center of your map
+## Challenge 5: Look up the latitude and longitude of your hometown (or your current home), and change the PROJ4 string lat_0 and lon_0. Then change the title to reflect the place you are centering.
+```{r}
+ggplot(data = world) +
+  geom_sf(fill = "#669438", color = "#32481B", size = 0.25) +
+    coord_sf(crs = "+proj=ortho +lat_0=21 +lon_0=-158 ") +
+  ggtitle("Ewa Beach, HI as the Center of the World", subtitle = "Orthographic Azimuthal")+
+  theme_void()
+```
+
