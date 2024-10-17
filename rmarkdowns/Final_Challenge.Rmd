@@ -1,6 +1,6 @@
 ---
-title: "Final Challenge Instructions"
-author: "Catherine Brockway"
+title: "Justice Mapping"
+author: "Andrew Nishitomi"
 date: "`r Sys.Date()`"
 output: 
   html_document:
@@ -24,7 +24,7 @@ library("vembedr")
 ## Island of Oahu
 
 # Introduction and Project Details
-Aloha, my name is Andrew Nishitomi. Currently, I am a student at Chaminade University working towards achieving my Bachelor's degree in Criminal Justice/Criminology and Data Science. The scope of this project is focused on the island of Oahu. In recent years, prisons have ran into the reoccurring issue of overcrowding with inmates and have struggled to house inmates that are born in raised in the State. As a subsequent consequence to the precedent issue at hand, new inmates have had to be send to other prisons within the United States to maintain the current population of state prisons and correctional facilities. This unprecedented issue has inspired me to investigate into whether or not the island of Oahu would be able to create a new facillity to house more inmates. However, I will take into consideration the location of hospitals and courthouses. I will also consider the population density of the Island of Oahu as well. 
+Aloha, my name is Andrew Nishitomi. Currently, I am a student at Chaminade University working towards achieving my Bachelor's degree in Criminal Justice/Criminology and Data Science. The scope of this project is focused on the island of Oahu. In recent years, prisons have ran into the reoccurring issue of overcrowding with inmates and have struggled to house inmates that are born in raised in the State. As a subsequent consequence to the precedent issue at hand, new inmates have had to be send to other prisons within the United States to maintain the current population of state prisons and correctional facilities. This unprecedented issue has inspired me to investigate into whether or not the island of Oahu would be able to create a new facility to house more inmates. However, I will take into consideration the location of hospitals and courthouses. I will also consider the population density of the Island of Oahu as well. 
 
 
 
@@ -219,18 +219,18 @@ library(leaflet)
 
 # Data frame with hospitals, courthouses, and prisons on Oahu
 locations_oahu <- data.frame(
-  name = c("The Queen's Medical Center", "Kaiser Permanente Moanalua Medical Center", "Pali Momi Medical Center",
+  name = c("The Queen's Medical Center", "The Queen's West Medical Center", "Kaiser Permanente Moanalua Medical Center", "Pali Momi Medical Center",
            "Straub Medical Center", "Kapi'olani Medical Center", "Adventist Health Castle",
            "Kuakini Medical Center", "Wahiawa General Hospital", "Tripler Army Medical Center",
            "First Circuit Court", "Hawaii Supreme Court", "Kapolei Court Complex",
            "Ewa District Court", "Wahiawa District Court", "Waianae District Court",
            "Kaneohe District Court", "Oahu Community Correctional Center", "Halawa Correctional Facility",
            "Women's Community Correctional Center", "Waiawa Correctional Facility"),
-  type = c(rep("Hospital", 9), rep("Courthouse", 7), rep("Prison", 4)),
-  lat = c(21.3099, 21.3754, 21.3854, 21.3045, 21.2956, 21.3889, 21.3210, 21.5016, 21.3606,
+  type = c(rep("Hospital", 10), rep("Courthouse", 7), rep("Prison", 4)),
+  lat = c(21.3099, 21.3441, 21.3754, 21.3854, 21.3045, 21.2956, 21.3889, 21.3210, 21.5016, 21.3606,
           21.3073, 21.3066, 21.3355, 21.3386, 21.5022, 21.4443, 21.4036,
           21.3242, 21.3853, 21.3985, 21.4448),
-  lng = c(-157.8545, -157.8870, -157.9458, -157.8511, -157.8419, -157.7896, -157.8567, -158.0190, -157.8902,
+  lng = c(-157.8545, -158.0250, -157.8870, -157.9458, -157.8511, -157.8419, -157.7896, -157.8567, -158.0190, -157.8902,
           -157.8581, -157.8609, -158.0482, -158.0365, -158.0189, -158.1924, -157.7995,
           -157.8687, -157.9076, -157.7861, -157.9786)
 )
@@ -253,6 +253,11 @@ leaflet(data = locations_oahu) %>%
 Being able to combine our idea from our previous map allows us to have the capability to access not only the distance from each Hospital, Courthouse, and Prison/Jail, but we have the ability to see if there is any available land to build a new prison. Based on our map above, we can see that it would be difficult to build a new prison based on the visual above. The space is very limited and restricted. Another thing to note is that we were able to add the names to the individual points of the locations as well. 
 
 The data came from looking up all the possible locations for prisons, hospitals, and courthouses on the Island of Oahu and retrieving each individual longitude and latitude point for the prospective locations. This would allow for a more accurate representation of all the hospitals and courthouses in comparison to the two maps that were previously made. 
+
+# Overall Interpretation
+In comparison to the 2nd and 3rd maps, we can notice that there are a few locations missing from map 2 to map 3. In map 2, I used the OSM data. In map 3, I utilized all coordinates of the possible locations that I can find. The missing data can be referred back to how much of the data is current. Or, what is considered a hospital, courthouse, and prison. 
+
+Based on the Leaflet map, we can see that the Federal Detention Center has the best access to a Courthouse and Hospital. Correctional facilities do have better access to Hospitals, but they would require longer distances of travel to the federal courthouse. 
 
 
 # Recommendations for future work
